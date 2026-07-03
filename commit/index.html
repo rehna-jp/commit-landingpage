@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>commit — show up or pay up</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0e0a1a;
+    --bg-deep: #0a0712;
+    --panel: #181122;
+    --panel-2: #1f1221;
+    --amethyst-300: #a190d5;
+    --amethyst-400: #826bc7;
+    --amethyst-500: #6346b9;
+    --amethyst-600: #4f3894;
+    --lilac-300: #c29dc8;
+    --lilac-400: #ae7cb6;
+    --lilac-500: #9a5ca3;
+    --orchid-300: #d392b6;
+    --orchid-400: #c56d9d;
+    --orchid-500: #b64985;
+    --orchid-600: #923a6a;
+    --text-hi: #f8f6fb;
+    --text-mid: #c3bfd9;
+    --text-low: #8478a3;
+    --line: rgba(193, 181, 227, 0.14);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-hi);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  .display { font-family: 'Space Grotesk', sans-serif; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  ::selection { background: var(--orchid-500); color: white; }
+
+  /* ===== atmosphere ===== */
+  .glow-field {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 900px 700px at 20% -10%, rgba(99,70,185,0.35), transparent 60%),
+      radial-gradient(ellipse 700px 600px at 90% 20%, rgba(182,73,133,0.22), transparent 55%),
+      radial-gradient(ellipse 600px 500px at 50% 100%, rgba(154,92,163,0.18), transparent 60%);
+  }
+
+  .noise {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.035; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  section, header, footer, nav { position: relative; z-index: 2; }
+
+  /* ===== animated circuit lines ===== */
+  .circuit-line {
+    position: absolute;
+    pointer-events: none;
+    stroke: url(#circuitGrad);
+    stroke-width: 1.5;
+    fill: none;
+    opacity: 0.5;
+  }
+
+  .pulse-dot {
+    fill: var(--orchid-400);
+    filter: drop-shadow(0 0 6px var(--orchid-400));
+  }
+
+  /* ===== nav ===== */
+  nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 24px 6vw;
+    backdrop-filter: blur(12px);
+    background: rgba(14, 10, 26, 0.6);
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; }
+  .nav-logo img { height: 30px; }
+  .live-pill {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px; letter-spacing: 0.05em;
+    color: var(--lilac-300);
+    border: 1px solid var(--amethyst-600);
+    padding: 7px 14px;
+    border-radius: 100px;
+    background: rgba(99,70,185,0.08);
+  }
+  .live-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--orchid-400); box-shadow: 0 0 8px var(--orchid-400); animation: blink 1.6s ease-in-out infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+  .nav-cta {
+    font-size: 13.5px; font-weight: 600;
+    padding: 11px 22px;
+    background: linear-gradient(135deg, var(--amethyst-500), var(--orchid-600));
+    border-radius: 8px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.25s cubic-bezier(.2,.8,.2,1);
+  }
+  .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(182,73,133,0.4); }
+
+  /* ===== hero ===== */
+  .hero {
+    min-height: 96vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 60px 6vw 60px;
+    position: relative;
+  }
+
+  .hero-logo-mark {
+    width: 64px; height: 64px;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: dropIn 0.8s cubic-bezier(.2,.8,.2,1) 0.1s forwards;
+  }
+  @keyframes dropIn { from { opacity: 0; transform: translateY(-20px) scale(0.8); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--orchid-300);
+    margin-bottom: 30px;
+    padding: 8px 18px;
+    border: 1px solid rgba(213,146,182,0.3);
+    border-radius: 100px;
+    background: rgba(182,73,133,0.07);
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.2s forwards;
+  }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  .hero h1 {
+    font-weight: 700;
+    font-size: clamp(3rem, 9vw, 7.4rem);
+    line-height: 0.96;
+    letter-spacing: -0.03em;
+    max-width: 18ch;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.35s forwards;
+  }
+
+  .hero h1 .line2 {
+    display: block;
+    background: linear-gradient(110deg, var(--orchid-300) 0%, var(--lilac-300) 35%, var(--amethyst-300) 70%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    background-size: 200% auto;
+    animation: shimmer 6s linear infinite;
+  }
+  @keyframes shimmer { to { background-position: 200% center; } }
+
+  .hero p.sub {
+    margin-top: 30px;
+    font-size: clamp(1.05rem, 1.7vw, 1.3rem);
+    color: var(--text-mid);
+    max-width: 48ch;
+    line-height: 1.55;
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.5s forwards;
+  }
+
+  .stake-strip {
+    margin-top: 36px;
+    display: flex; gap: 28px; flex-wrap: wrap; justify-content: center;
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.6s forwards;
+  }
+  .stake-item { display: flex; align-items: baseline; gap: 8px; }
+  .stake-item .num { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.6rem; color: var(--text-hi); }
+  .stake-item .label { font-size: 12px; color: var(--text-low); text-transform: uppercase; letter-spacing: 0.06em; }
+  .stake-divider { width: 1px; background: var(--line); }
+
+  /* ===== waitlist form ===== */
+  .waitlist {
+    margin-top: 44px;
+    display: flex; gap: 0;
+    width: 100%; max-width: 460px;
+    border: 1px solid var(--amethyst-600);
+    border-radius: 12px;
+    padding: 5px;
+    background: rgba(99,70,185,0.06);
+    opacity: 0;
+    animation: fadeUp 0.7s ease 0.7s forwards;
+  }
+  .waitlist input {
+    flex: 1; background: transparent; border: none; outline: none;
+    padding: 13px 16px; color: var(--text-hi); font-size: 15px;
+  }
+  .waitlist input::placeholder { color: var(--text-low); }
+  .waitlist button {
+    background: linear-gradient(135deg, var(--amethyst-500), var(--orchid-600));
+    border: none; border-radius: 9px; padding: 13px 24px;
+    color: white; font-size: 14.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .waitlist button:hover { transform: scale(1.03); box-shadow: 0 8px 26px rgba(182,73,133,0.45); }
+  .waitlist button:focus-visible, .waitlist input:focus-visible, .nav-cta:focus-visible { outline: 2px solid var(--lilac-300); outline-offset: 2px; }
+
+  .waitlist-note { margin-top: 16px; font-size: 12.5px; color: var(--text-low); font-family: 'JetBrains Mono', monospace; opacity: 0; animation: fadeUp 0.7s ease 0.8s forwards; }
+  .form-msg { margin-top: 16px; font-size: 13.5px; color: var(--lilac-300); display: none; font-weight: 600; }
+
+  @media (max-width: 540px) { .waitlist { flex-direction: column; } .waitlist button { width: 100%; } }
+
+  /* ===== marquee ===== */
+  .marquee-wrap {
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    padding: 18px 0; overflow: hidden;
+    background: linear-gradient(90deg, rgba(99,70,185,0.06), rgba(182,73,133,0.06));
+  }
+  .marquee { display: flex; width: max-content; animation: scroll 28s linear infinite; }
+  .marquee span {
+    font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text-low);
+    padding: 0 32px; white-space: nowrap; display: flex; align-items: center; gap: 32px;
+  }
+  .marquee span::after { content: '◆'; color: var(--orchid-500); font-size: 10px; }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+
+  /* ===== section shared ===== */
+  .section { padding: 130px 6vw; }
+  .section-head { max-width: 680px; margin: 0 auto 70px; text-align: center; }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-low);
+    letter-spacing: 0.12em; margin-bottom: 18px;
+  }
+  .section-head h2 {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; letter-spacing: -0.02em;
+  }
+  .section-head h2 .hl {
+    background: linear-gradient(110deg, var(--orchid-300), var(--lilac-300));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  /* ===== how it works ===== */
+  .flow {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px;
+  }
+  .flow-step {
+    background: linear-gradient(160deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 32px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(.2,.8,.2,1), border-color 0.3s ease;
+  }
+  .flow-step:hover { transform: translateY(-6px); border-color: var(--amethyst-400); }
+  .flow-step::before {
+    content: '';
+    position: absolute; top: -40%; right: -40%;
+    width: 140px; height: 140px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(99,70,185,0.25), transparent 70%);
+  }
+  .flow-num {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 2.4rem;
+    background: linear-gradient(135deg, var(--amethyst-400), var(--orchid-400));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin-bottom: 18px; display: block;
+  }
+  .flow-step h3 { font-size: 17px; margin-bottom: 10px; font-weight: 600; }
+  .flow-step p { font-size: 13.5px; color: var(--text-low); line-height: 1.6; }
+  .flow-arrow { display: none; }
+
+  @media (max-width: 900px) {
+    .flow { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) {
+    .flow { grid-template-columns: 1fr; }
+  }
+
+  /* ===== live pool visual ===== */
+  .pool-visual {
+    max-width: 1000px; margin: 0 auto;
+    background: linear-gradient(160deg, var(--panel), var(--bg-deep));
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .pool-visual::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 500px 300px at 50% 0%, rgba(182,73,133,0.15), transparent 70%);
+  }
+  .pool-grid {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 40px; align-items: center;
+  }
+  .pool-side { text-align: center; }
+  .pool-side .pool-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .pool-side.quit .pool-label { color: var(--text-low); }
+  .pool-side.win .pool-label { color: var(--orchid-300); }
+
+  .avatar-row { display: flex; justify-content: center; gap: -8px; margin-bottom: 16px; }
+  .avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    border: 2px solid var(--bg);
+    margin-left: -10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px;
+  }
+  .avatar:first-child { margin-left: 0; }
+  .pool-side.quit .avatar { background: var(--panel-2); color: var(--text-low); opacity: 0.5; }
+  .pool-side.win .avatar { background: linear-gradient(135deg, var(--amethyst-500), var(--orchid-500)); color: white; box-shadow: 0 0 16px rgba(182,73,133,0.4); }
+
+  .pool-amount { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 2.2rem; }
+  .pool-side.quit .pool-amount { color: var(--text-low); text-decoration: line-through; text-decoration-color: var(--orchid-500); }
+  .pool-side.win .pool-amount { color: var(--text-hi); }
+  .pool-sub { font-size: 12.5px; color: var(--text-low); margin-top: 6px; }
+
+  .pool-arrow {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .pool-arrow svg { animation: flow 1.8s ease-in-out infinite; }
+  @keyframes flow { 0%,100% { transform: translateX(0); opacity: 0.6; } 50% { transform: translateX(8px); opacity: 1; } }
+  .pool-arrow span { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-low); white-space: nowrap; }
+
+  @media (max-width: 720px) {
+    .pool-grid { grid-template-columns: 1fr; gap: 24px; }
+    .pool-arrow { transform: rotate(90deg); }
+  }
+
+  /* ===== demo ===== */
+  .demo-frame {
+    max-width: 900px; margin: 0 auto;
+    border-radius: 20px; border: 1px solid var(--line);
+    background: linear-gradient(160deg, var(--panel), var(--bg-deep));
+    aspect-ratio: 16/9;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .demo-frame::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(99,70,185,0.2), transparent 70%);
+  }
+  .demo-placeholder { position: relative; z-index: 1; text-align: center; color: var(--text-low); }
+  .play-btn {
+    width: 76px; height: 76px; margin: 0 auto 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--amethyst-500), var(--orchid-600));
+    display: flex; align-items: center; justify-content: center;
+    color: white; cursor: pointer;
+    box-shadow: 0 0 0 0 rgba(182,73,133,0.5);
+    animation: ripple 2.2s ease-out infinite;
+  }
+  @keyframes ripple { 0% { box-shadow: 0 0 0 0 rgba(182,73,133,0.4); } 70% { box-shadow: 0 0 0 22px rgba(182,73,133,0); } 100% { box-shadow: 0 0 0 0 rgba(182,73,133,0); } }
+
+  /* ===== why grid ===== */
+  .diff-grid {
+    max-width: 1000px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+  }
+  .diff-card {
+    background: linear-gradient(160deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--line);
+    border-radius: 18px; padding: 38px 28px;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+  .diff-card:hover { transform: translateY(-6px); border-color: var(--orchid-400); }
+  .diff-card .icon-wrap {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: linear-gradient(135deg, rgba(99,70,185,0.25), rgba(182,73,133,0.25));
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 24px;
+  }
+  .diff-card .icon { width: 22px; height: 22px; color: var(--lilac-300); }
+  .diff-card h3 { font-size: 17px; margin-bottom: 12px; font-weight: 600; }
+  .diff-card p { font-size: 13.5px; line-height: 1.65; color: var(--text-low); }
+
+  @media (max-width: 760px) { .diff-grid { grid-template-columns: 1fr; } }
+
+  /* ===== final cta ===== */
+  .final-cta {
+    text-align: center; padding: 150px 6vw 130px;
+    position: relative;
+  }
+  .final-cta-glow {
+    position: absolute; inset: 0; z-index: -1;
+    background: radial-gradient(ellipse 600px 400px at 50% 50%, rgba(182,73,133,0.15), transparent 70%);
+  }
+  .final-cta h2 {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: clamp(2.4rem, 6vw, 4.4rem); max-width: 18ch; margin: 0 auto 22px; line-height: 1.05; letter-spacing: -0.02em;
+  }
+  .final-cta .tagline {
+    background: linear-gradient(110deg, var(--orchid-300), var(--lilac-300));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .final-cta p.sub { color: var(--text-mid); font-size: 16px; margin-bottom: 44px; }
+
+  /* ===== footer ===== */
+  footer {
+    border-top: 1px solid var(--line); padding: 44px 6vw;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+  }
+  .footer-logo { display: flex; align-items: center; gap: 10px; color: var(--text-low); font-size: 13px; }
+  .footer-logo img { height: 20px; opacity: 0.7; }
+  .footer-links { display: flex; gap: 28px; }
+  .footer-links a { color: var(--text-low); text-decoration: none; font-size: 13px; font-family: 'JetBrains Mono', monospace; transition: color 0.2s ease; }
+  .footer-links a:hover { color: var(--orchid-300); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0">
+  <defs>
+    <linearGradient id="circuitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d392b6"/>
+      <stop offset="100%" stop-color="#826bc7"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="glow-field"></div>
+<div class="noise"></div>
+
+<nav>
+  <div class="nav-logo">
+    <img src="commit_logo_final.png" alt="commit">
+  </div>
+  <div style="display:flex; align-items:center; gap:18px;">
+    <div class="live-pill"><span class="dot"></span>devnet live</div>
+    <a href="#waitlist-form" class="nav-cta">Join waitlist</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <img src="commit_logo_final.png" alt="" class="hero-logo-mark" style="object-fit:contain;">
+  <div class="eyebrow">on-chain group accountability · solana</div>
+  <h1 class="display">Show up daily<br><span class="line2">or pay up.</span></h1>
+  <p class="sub">commit is a group habit challenge protocol. Stake USDC with your group, prove you showed up with AI-verified proof — when the challenge ends, everyone who quit funds the reward for everyone who didn't.</p>
+
+  <div class="stake-strip">
+    <div class="stake-item"><span class="num">3rd</span><span class="label">Dev3pack hackathon</span></div>
+    <div class="stake-divider"></div>
+    <div class="stake-item"><span class="num">2</span><span class="label">accelerators</span></div>
+    <div class="stake-divider"></div>
+    <div class="stake-item"><span class="num">100%</span><span class="label">on-chain</span></div>
+  </div>
+
+  <form class="waitlist" id="waitlist-form" action="https://gmail.us11.list-manage.com/subscribe/post?u=14bbb20a71f159c300776fef5&amp;id=b54c9dfc8f&amp;f_id=0062d5e0f0" method="post" target="_blank" style="position:relative;">
+    <input type="email" name="EMAIL" placeholder="you@email.com" required aria-label="Email address">
+    <input type="text" name="FNAME" placeholder="First name" aria-label="First name" style="flex:0.55;background:transparent;border:none;border-left:1px solid var(--line);outline:none;padding:13px 10px;color:var(--text-hi);font-size:15px;">
+    <div aria-hidden="true" style="position:absolute;left:-5000px;"><input type="text" name="b_14bbb20a71f159c300776fef5_b54c9dfc8f" tabindex="-1" value=""></div>
+    <button type="submit">Join waitlist</button>
+  </form>
+  <p class="waitlist-note">// no spam. just one email when commit opens.</p>
+</header>
+
+<div class="marquee-wrap">
+  <div class="marquee">
+    <span>STAKE USDC</span><span>AI-VERIFIED PROOF</span><span>QUITTERS FUND WINNERS</span><span>FULLY ON-CHAIN</span><span>BUILT ON SOLANA</span>
+    <span>STAKE USDC</span><span>AI-VERIFIED PROOF</span><span>QUITTERS FUND WINNERS</span><span>FULLY ON-CHAIN</span><span>BUILT ON SOLANA</span>
+  </div>
+</div>
+
+<section class="section" id="how-it-works">
+  <div class="section-head">
+    <div class="section-num mono">[ 01 — THE MECHANIC ]</div>
+    <h2>Four steps. <span class="hl">Real stakes.</span></h2>
+  </div>
+
+  <div class="flow">
+    <div class="flow-step">
+      <span class="flow-num mono">01</span>
+      <h3>Join a challenge</h3>
+      <p>Create or join a public group challenge with a shared habit goal.</p>
+    </div>
+    <div class="flow-step">
+      <span class="flow-num mono">02</span>
+      <h3>Stake USDC</h3>
+      <p>Put real money on the line, locked in the group's smart contract.</p>
+    </div>
+    <div class="flow-step">
+      <span class="flow-num mono">03</span>
+      <h3>Submit proof</h3>
+      <p>Upload daily photo proof. Groq AI verifies it on-chain, instantly.</p>
+    </div>
+    <div class="flow-step">
+      <span class="flow-num mono">04</span>
+      <h3>Winners get paid</h3>
+      <p>Dropped stakes are redistributed to everyone who finished. Automatically.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pool">
+  <div class="section-head">
+    <div class="section-num mono">[ 02 — THE POOL ]</div>
+    <h2>When the challenge ends, <span class="hl">the math is brutal.</span></h2>
+  </div>
+
+  <div class="pool-visual">
+    <div class="pool-grid">
+      <div class="pool-side quit">
+        <div class="pool-label">5 people quit</div>
+        <div class="avatar-row">
+          <div class="avatar">JK</div>
+          <div class="avatar">MN</div>
+          <div class="avatar">TR</div>
+          <div class="avatar">AO</div>
+          <div class="avatar">PL</div>
+        </div>
+        <div class="pool-amount">$250</div>
+        <div class="pool-sub">staked → slashed</div>
+      </div>
+
+      <div class="pool-arrow">
+        <svg width="40" height="24" viewBox="0 0 40 24" fill="none">
+          <path d="M2 12H34M34 12L26 4M34 12L26 20" stroke="#d392b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>redistributed</span>
+      </div>
+
+      <div class="pool-side win">
+        <div class="pool-label">5 people showed up</div>
+        <div class="avatar-row">
+          <div class="avatar">RH</div>
+          <div class="avatar">MU</div>
+          <div class="avatar">EL</div>
+          <div class="avatar">+2</div>
+        </div>
+        <div class="pool-amount">+$49</div>
+        <div class="pool-sub">extra, per winner</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="demo">
+  <div class="section-head">
+    <div class="section-num mono">[ 03 — SEE IT WORK ]</div>
+    <h2>Watch the <span class="hl">redistribution</span> happen.</h2>
+  </div>
+
+  <div class="demo-frame">
+    <div class="demo-placeholder">
+      <div class="play-btn">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+      <p class="mono" style="font-size: 13px;">demo dropping soon</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="why">
+  <div class="section-head">
+    <div class="section-num mono">[ 04 — WHY COMMIT ]</div>
+    <h2>Nobody else makes <span class="hl">quitting cost something</span> — and pays it forward.</h2>
+  </div>
+
+  <div class="diff-grid">
+    <div class="diff-card">
+      <div class="icon-wrap">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2L4 7v10l8 5 8-5V7z"/><path d="M12 12v9M12 12L4 7M12 12l8-5"/></svg>
+      </div>
+      <h3>Quitters fund winners</h3>
+      <p>Other apps send your stake to charity or absorb it. commit pays it directly to the people who showed up.</p>
+    </div>
+    <div class="diff-card">
+      <div class="icon-wrap">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+      <h3>AI verifies, instantly</h3>
+      <p>No human reviewer, no honor system. Groq AI checks your proof and signs it on-chain in seconds.</p>
+    </div>
+    <div class="diff-card">
+      <div class="icon-wrap">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      </div>
+      <h3>Fully on-chain</h3>
+      <p>No company holds your money or decides outcomes. The smart contract is the referee.</p>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="final-cta-glow"></div>
+  <h2 class="display">Show up or pay up.<br><span class="tagline">Your call.</span></h2>
+  <p class="sub">Be first to know when commit opens its first public challenge.</p>
+  <form class="waitlist" style="margin: 0 auto; position:relative;" action="https://gmail.us11.list-manage.com/subscribe/post?u=14bbb20a71f159c300776fef5&amp;id=b54c9dfc8f&amp;f_id=0062d5e0f0" method="post" target="_blank">
+    <input type="email" name="EMAIL" placeholder="you@email.com" required aria-label="Email address">
+    <input type="text" name="FNAME" placeholder="First name" aria-label="First name" style="flex:0.55;background:transparent;border:none;border-left:1px solid var(--line);outline:none;padding:13px 10px;color:var(--text-hi);font-size:15px;">
+    <div aria-hidden="true" style="position:absolute;left:-5000px;"><input type="text" name="b_14bbb20a71f159c300776fef5_b54c9dfc8f" tabindex="-1" value=""></div>
+    <button type="submit">Join waitlist</button>
+  </form>
+</section>
+
+<footer>
+  <div class="footer-logo">
+    <img src="commit_logo_final.png" alt="">
+    <span>commit, 2026</span>
+  </div>
+  <div class="footer-links">
+    <a href="#" target="_blank">X / Twitter</a>
+    <a href="#" target="_blank">Devnet demo</a>
+  </div>
+</footer>
+
+<canvas id="bgCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+
+<script>
+// ===== PARTICLE NETWORK =====
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+
+let W, H, nodes, animId;
+
+const COLORS = {
+  node: ['#826bc7','#6346b9','#b64985','#9a5ca3','#c29dc8'],
+  line: 'rgba(130,107,199,',
+  glow: ['rgba(182,73,133,','rgba(99,70,185,']
+};
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+class Node {
+  constructor() { this.reset(true); }
+  reset(init) {
+    this.x = Math.random() * W;
+    this.y = init ? Math.random() * H : H + 10;
+    this.vx = (Math.random() - 0.5) * 0.28;
+    this.vy = -(Math.random() * 0.18 + 0.06);
+    this.r = Math.random() * 2.2 + 1;
+    this.color = COLORS.node[Math.floor(Math.random() * COLORS.node.length)];
+    this.glowColor = COLORS.glow[Math.floor(Math.random() * 2)];
+    this.alpha = 0;
+    this.targetAlpha = Math.random() * 0.55 + 0.2;
+    this.pulse = Math.random() * Math.PI * 2;
+    this.pulseSpeed = Math.random() * 0.012 + 0.004;
+    // circuit node type: 0=circle, 1=diamond, 2=cross-dot
+    this.type = Math.floor(Math.random() * 3);
+    this.size = Math.random() * 3 + 1.5;
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.pulse += this.pulseSpeed;
+    if (this.alpha < this.targetAlpha) this.alpha = Math.min(this.alpha + 0.008, this.targetAlpha);
+    if (this.y < -20 || this.x < -20 || this.x > W + 20) this.reset(false);
+  }
+  draw() {
+    const pulse = Math.sin(this.pulse) * 0.3 + 0.7;
+    const a = this.alpha * pulse;
+    ctx.save();
+    ctx.globalAlpha = a;
+
+    // glow
+    const grd = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 5);
+    grd.addColorStop(0, this.glowColor + '0.35)');
+    grd.addColorStop(1, this.glowColor + '0)');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size * 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = this.color;
+    ctx.strokeStyle = this.color;
+
+    if (this.type === 0) {
+      // circle node
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (this.type === 1) {
+      // diamond
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y - this.size * 1.4);
+      ctx.lineTo(this.x + this.size * 1.4, this.y);
+      ctx.lineTo(this.x, this.y + this.size * 1.4);
+      ctx.lineTo(this.x - this.size * 1.4, this.y);
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      // circuit cross-dot
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size * 0.7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(this.x - this.size * 2.5, this.y);
+      ctx.lineTo(this.x + this.size * 2.5, this.y);
+      ctx.moveTo(this.x, this.y - this.size * 2.5);
+      ctx.lineTo(this.x, this.y + this.size * 2.5);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+
+// ===== CIRCUIT TRACES =====
+class Trace {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.len = Math.random() * 120 + 40;
+    this.dir = [0,1,2,3][Math.floor(Math.random()*4)]; // 0=right,1=up,2=left,3=down
+    this.progress = 0;
+    this.speed = Math.random() * 0.6 + 0.2;
+    this.alpha = 0;
+    this.maxAlpha = Math.random() * 0.12 + 0.04;
+    this.color = COLORS.node[Math.floor(Math.random() * COLORS.node.length)];
+    this.done = false;
+    this.fade = false;
+  }
+  update() {
+    if (!this.fade) {
+      this.progress = Math.min(this.progress + this.speed, this.len);
+      if (this.alpha < this.maxAlpha) this.alpha += 0.003;
+      if (this.progress >= this.len) this.fade = true;
+    } else {
+      this.alpha -= 0.002;
+      if (this.alpha <= 0) this.done = true;
+    }
+  }
+  draw() {
+    if (this.alpha <= 0) return;
+    const dx = [1,0,-1,0][this.dir];
+    const dy = [0,-1,0,1][this.dir];
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y);
+    ctx.lineTo(this.x + dx * this.progress, this.y + dy * this.progress);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function connectNodes() {
+  const maxDist = 160;
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < maxDist) {
+        const a = (1 - dist/maxDist) * 0.12 * Math.min(nodes[i].alpha, nodes[j].alpha);
+        ctx.save();
+        ctx.globalAlpha = a;
+        ctx.strokeStyle = '#826bc7';
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        // right-angle circuit path
+        ctx.lineTo(nodes[i].x, nodes[j].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+  }
+}
+
+let traces = [];
+let traceTimer = 0;
+
+function init() {
+  resize();
+  const count = Math.min(Math.floor(W * H / 18000), 65);
+  nodes = Array.from({length: count}, () => new Node());
+  traces = [];
+}
+
+function tick() {
+  ctx.clearRect(0, 0, W, H);
+
+  // spawn new trace
+  traceTimer++;
+  if (traceTimer > 40) {
+    traceTimer = 0;
+    if (traces.length < 18) traces.push(new Trace());
+  }
+
+  // draw traces
+  traces.forEach(t => { t.update(); t.draw(); });
+  traces = traces.filter(t => !t.done);
+
+  connectNodes();
+  nodes.forEach(n => { n.update(); n.draw(); });
+
+  animId = requestAnimationFrame(tick);
+}
+
+window.addEventListener('resize', () => { cancelAnimationFrame(animId); init(); tick(); });
+
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  canvas.style.display = 'none';
+} else {
+  init();
+  tick();
+}
+
+// ===== FORM =====
+function handleSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const msg = form.parentElement.querySelector('.form-msg') || document.getElementById('form-msg-1');
+  if (msg) msg.style.display = 'block';
+  form.reset();
+  return false;
+}
+</script>
+
+</body>
+</html>
