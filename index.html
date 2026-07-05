@@ -444,32 +444,37 @@
     <img src="commit_logo_final.png" alt="commit">
   </div>
   <div style="display:flex; align-items:center; gap:18px;">
-    <div class="live-pill"><span class="dot"></span>devnet live</div>
+    <div class="https://commit-gamma-two.vercel.app/"><span class="dot"></span>devnet live</div>
     <a href="#waitlist-form" class="nav-cta">Join waitlist</a>
   </div>
 </nav>
 
 <header class="hero">
   <img src="commit_logo_final.png" alt="" class="hero-logo-mark" style="object-fit:contain;">
-  <div class="eyebrow">on-chain group accountability · solana</div>
+  <div class="eyebrow">group habit accountability · built on solana</div>
   <h1 class="display">Show up daily<br><span class="line2">or pay up.</span></h1>
-  <p class="sub">commit is a group habit challenge protocol. Stake USDC with your group, prove you showed up with AI-verified proof — when the challenge ends, everyone who quit funds the reward for everyone who didn't.</p>
+  <p class="sub">Most people quit their goals because quitting is free. commit changes that. Stake USDC on your habit, prove you showed up daily — when the challenge ends, quitters' stakes go directly to the people who didn't quit.</p>
 
   <div class="stake-strip">
-    <div class="stake-item"><span class="num">3rd</span><span class="label">Dev3pack hackathon</span></div>
+    <div class="stake-item"><span class="num">3rd</span><span class="label">global hackathon 2026</span></div>
     <div class="stake-divider"></div>
-    <div class="stake-item"><span class="num">2</span><span class="label">accelerators</span></div>
+    <div class="stake-item"><span class="num">2</span><span class="label">active accelerators</span></div>
     <div class="stake-divider"></div>
     <div class="stake-item"><span class="num">100%</span><span class="label">on-chain</span></div>
   </div>
 
-  <form class="waitlist" id="waitlist-form" action="https://gmail.us11.list-manage.com/subscribe/post?u=14bbb20a71f159c300776fef5&amp;id=b54c9dfc8f&amp;f_id=0062d5e0f0" method="post" target="_blank" style="position:relative;">
-    <input type="email" name="EMAIL" placeholder="you@email.com" required aria-label="Email address">
-    <input type="text" name="FNAME" placeholder="First name" aria-label="First name" style="flex:0.4;min-width:0;background:transparent;border:none;border-left:1px solid var(--line);outline:none;padding:13px 10px;color:var(--text-hi);font-size:14px;overflow:hidden;">
-    <div aria-hidden="true" style="position:absolute;left:-5000px;"><input type="text" name="b_14bbb20a71f159c300776fef5_b54c9dfc8f" tabindex="-1" value=""></div>
-    <button type="submit">Join waitlist</button>
-  </form>
-  <p class="waitlist-note">// no spam. just one email when commit opens.</p>
+  <div id="hero-form-wrap">
+    <form class="waitlist" id="waitlist-form" style="position:relative;" onsubmit="return submitToMailchimp(event, 'hero-form-wrap', 'hero-success')">
+      <input type="email" name="EMAIL" placeholder="your@email.com" required aria-label="Email address">
+      <input type="text" name="FNAME" placeholder="First name" aria-label="First name" style="flex:0.4;min-width:0;background:transparent;border:none;border-left:1px solid var(--line);outline:none;padding:13px 10px;color:var(--text-hi);font-size:14px;overflow:hidden;">
+      <button type="submit">Join waitlist</button>
+    </form>
+    <p class="waitlist-note">// no spam. one email when we go live on mainnet.</p>
+    <div id="hero-success" style="display:none; margin-top:20px; text-align:center;">
+      <p style="font-family:'Space Grotesk',sans-serif; font-size:1.1rem; color:var(--lilac-300); font-weight:600;">You're in. 🎉</p>
+      <p style="font-size:13px; color:var(--text-low); margin-top:6px;">We'll reach out before the first public challenge opens.</p>
+    </div>
+  </div>
 </header>
 
 <div class="marquee-wrap">
@@ -482,7 +487,7 @@
 <section class="section" id="how-it-works">
   <div class="section-head">
     <div class="section-num mono">[ 01 — THE MECHANIC ]</div>
-    <h2>Four steps. <span class="hl">Real stakes.</span></h2>
+    <h2>Simple mechanic. <span class="hl">Real consequences.</span></h2>
   </div>
 
   <div class="flow">
@@ -499,12 +504,12 @@
     <div class="flow-step">
       <span class="flow-num mono">03</span>
       <h3>Submit proof</h3>
-      <p>Upload daily photo proof. Groq AI verifies it on-chain, instantly.</p>
+      <p>Upload daily photo proof. AI verifies it on-chain, instantly.</p>
     </div>
     <div class="flow-step">
       <span class="flow-num mono">04</span>
-      <h3>Winners get paid</h3>
-      <p>Dropped stakes are redistributed to everyone who finished. Automatically.</p>
+      <h3>Quitters fund winners</h3>
+      <p>The smart contract slashes quitters' stakes and pays them directly to everyone who completed. No middleman.</p>
     </div>
   </div>
 </section>
@@ -512,7 +517,7 @@
 <section class="section" id="pool">
   <div class="section-head">
     <div class="section-num mono">[ 02 — THE POOL ]</div>
-    <h2>When the challenge ends, <span class="hl">the math is brutal.</span></h2>
+    <h2>When it's over, <span class="hl">the people who quit pay the people who didn't.</span></h2>
   </div>
 
   <div class="pool-visual">
@@ -571,7 +576,7 @@
 <section class="section" id="why">
   <div class="section-head">
     <div class="section-num mono">[ 04 — WHY COMMIT ]</div>
-    <h2>Nobody else makes <span class="hl">quitting cost something</span> — and pays it forward.</h2>
+    <h2>StickK sends your money to charity. DietBet keeps a cut. <span class="hl">commit pays the winners.</span></h2>
   </div>
 
   <div class="diff-grid">
@@ -580,35 +585,40 @@
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2L4 7v10l8 5 8-5V7z"/><path d="M12 12v9M12 12L4 7M12 12l8-5"/></svg>
       </div>
       <h3>Quitters fund winners</h3>
-      <p>Other apps send your stake to charity or absorb it. commit pays it directly to the people who showed up.</p>
+      <p>StickK sends your money to charity. DietBet takes a platform cut. commit sends it directly to the people in your group who didn't quit.</p>
     </div>
     <div class="diff-card">
       <div class="icon-wrap">
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
       </div>
-      <h3>AI verifies, instantly</h3>
-      <p>No human reviewer, no honor system. Groq AI checks your proof and signs it on-chain in seconds.</p>
+      <h3>AI is the referee</h3>
+      <p>No human reviewer, no honor system, no disputes with a company. AI verifies your photo proof and signs it cryptographically on-chain — in seconds.</p>
     </div>
     <div class="diff-card">
       <div class="icon-wrap">
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
       </div>
-      <h3>Fully on-chain</h3>
-      <p>No company holds your money or decides outcomes. The smart contract is the referee.</p>
+      <h3>No company in the middle</h3>
+      <p>Your money sits in a smart contract, not a company's bank account. commit takes a flat 5% of the redistribution pool at the end — nothing to join, nothing to stake, nothing hidden. The other 95% goes directly to the people who showed up.</p>
     </div>
   </div>
 </section>
 
 <section class="final-cta">
   <div class="final-cta-glow"></div>
-  <h2 class="display">Show up or pay up.<br><span class="tagline">Your call.</span></h2>
-  <p class="sub">Be first to know when commit opens its first public challenge.</p>
-  <form class="waitlist" style="margin: 0 auto; position:relative;" action="https://gmail.us11.list-manage.com/subscribe/post?u=14bbb20a71f159c300776fef5&amp;id=b54c9dfc8f&amp;f_id=0062d5e0f0" method="post" target="_blank">
-    <input type="email" name="EMAIL" placeholder="you@email.com" required aria-label="Email address">
-    <input type="text" name="FNAME" placeholder="First name" aria-label="First name" style="flex:0.4;min-width:0;background:transparent;border:none;border-left:1px solid var(--line);outline:none;padding:13px 10px;color:var(--text-hi);font-size:14px;overflow:hidden;">
-    <div aria-hidden="true" style="position:absolute;left:-5000px;"><input type="text" name="b_14bbb20a71f159c300776fef5_b54c9dfc8f" tabindex="-1" value=""></div>
-    <button type="submit">Join waitlist</button>
-  </form>
+  <h2 class="display">Ready to put<br><span class="tagline">money on it?</span></h2>
+  <p class="sub">Join the waitlist. Be first in when commit opens its first public challenge on mainnet.</p>
+  <div id="bottom-form-wrap">
+    <form class="waitlist" style="margin: 0 auto; position:relative;" onsubmit="return submitToMailchimp(event, 'bottom-form-wrap', 'bottom-success')">
+      <input type="email" name="EMAIL" placeholder="your@email.com" required aria-label="Email address">
+      <input type="text" name="FNAME" placeholder="First name" aria-label="First name" style="flex:0.4;min-width:0;background:transparent;border:none;border-left:1px solid var(--line);outline:none;padding:13px 10px;color:var(--text-hi);font-size:14px;overflow:hidden;">
+      <button type="submit">Join waitlist</button>
+    </form>
+    <div id="bottom-success" style="display:none; margin-top:24px; text-align:center;">
+      <p style="font-family:'Space Grotesk',sans-serif; font-size:1.1rem; color:var(--lilac-300); font-weight:600;">You're in. 🎉</p>
+      <p style="font-size:13px; color:var(--text-low); margin-top:6px;">We'll reach out before the first public challenge opens.</p>
+    </div>
+  </div>
 </section>
 
 <footer>
@@ -814,6 +824,42 @@ function tick() {
 }
 
 window.addEventListener('resize', () => { cancelAnimationFrame(animId); init(); tick(); });
+
+// ===== MAILCHIMP INLINE SUBMIT =====
+function submitToMailchimp(e, wrapId, successId) {
+  e.preventDefault();
+  const form = e.target;
+  const email = form.querySelector('input[name="EMAIL"]').value;
+  const fname = form.querySelector('input[name="FNAME"]') ? form.querySelector('input[name="FNAME"]').value : '';
+
+  const url = 'https://gmail.us11.list-manage.com/subscribe/post?u=14bbb20a71f159c300776fef5&id=b54c9dfc8f&f_id=0062d5e0f0&EMAIL=' + encodeURIComponent(email) + '&FNAME=' + encodeURIComponent(fname);
+
+  // Submit via hidden iframe to avoid redirect
+  let iframe = document.getElementById('mc-iframe');
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.id = 'mc-iframe';
+    iframe.name = 'mc-iframe';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+  }
+
+  form.target = 'mc-iframe';
+  form.action = 'https://gmail.us11.list-manage.com/subscribe/post?u=14bbb20a71f159c300776fef5&id=b54c9dfc8f&f_id=0062d5e0f0';
+  form.method = 'post';
+  form.submit();
+
+  // Show success immediately
+  setTimeout(() => {
+    const wrap = document.getElementById(wrapId);
+    const success = document.getElementById(successId);
+    if (wrap) wrap.querySelector('form').style.display = 'none';
+    if (wrap) wrap.querySelector('.waitlist-note') && (wrap.querySelector('.waitlist-note').style.display = 'none');
+    if (success) success.style.display = 'block';
+  }, 400);
+
+  return false;
+}
 
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   canvas.style.display = 'none';
